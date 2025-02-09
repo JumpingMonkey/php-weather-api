@@ -1,1 +1,49 @@
 .env
+/vendor/
+composer.phar
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+.phpstorm.meta.php
+.php_cs.cache
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+
+# Cache and temporary files
+/tmp/
+/temp/
+/cache/
+*.cache
+
+# Docker
+.docker/data/
+docker-compose.override.yml
+
+# PHP specific
+phpunit.xml
+.phpunit.result.cache
+.php_cs.cache
+.php-cs-fixer.cache
+
+# Build files
+/build/
+/dist/
+/node_modules/
+
+# Application specific
+/storage/*.key
+/public/storage
+/public/hot
