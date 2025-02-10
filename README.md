@@ -2,6 +2,8 @@
 
 A modern PHP-based Weather API that provides current weather data using the Visual Crossing Weather API. Features include Redis caching, OpenAPI documentation, and Docker deployment.
 
+> 🎯 This project is based on the [Weather API Wrapper Service](https://roadmap.sh/projects/weather-api-wrapper-service) from roadmap.sh
+
 ## Features
 
 - 🌤 Real-time weather data from Visual Crossing
