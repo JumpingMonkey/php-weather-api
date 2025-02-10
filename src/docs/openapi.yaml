@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: Weather API Documentation
+  version: 1.0.0
+  description: A PHP-based Weather API that provides current weather information with Redis caching
+  contact:
+    email: support@example.com
+    name: API Support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local Development Server
+
+tags:
+  - name: Weather
+    description: Weather information endpoints
+
+paths:
+  /weather/{city}:
+    get:
+      summary: Get current weather information for a city
+      description: Retrieves current weather data including temperature, conditions, humidity, and wind speed
+      operationId: getWeather
+      tags:
+        - Weather
+      parameters:
+        - name: city
+          in: path
+          description: City name (e.g., London, New York, Tokyo)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherResponse'
+        '404':
+          description: City not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    WeatherResponse:
+      type: object
+      properties:
+        location:
+          type: string
+          example: London, UK
+        current_weather:
+          type: object
+          properties:
+            temperature:
+              type: string
+              example: 22°C
+            conditions:
+              type: string
+              example: Partly cloudy
+            humidity:
+              type: string
+              example: 65%
+            wind_speed:
+              type: string
+              example: 12 km/h
+            feels_like:
+              type: string
+              example: 24°C
+        last_updated:
+          type: string
+          example: "14:30"
+        cached:
+          type: boolean
+          example: true
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: City not found
