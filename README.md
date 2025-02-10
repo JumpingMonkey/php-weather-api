@@ -1,188 +1,300 @@
 # PHP Weather API
 
-A simple and efficient weather API service built with PHP that provides current weather information using the Visual Crossing Weather API. The service includes Redis caching for improved performance.
+A modern PHP-based Weather API that provides current weather data using the Visual Crossing Weather API. Features include Redis caching, OpenAPI documentation, and Docker deployment.
 
 ## Features
 
-- Get current weather information by city name
-- Redis caching with 12-hour TTL
-- Docker containerization
-- Clean and formatted weather data output
-- Error handling and logging
+- 🌤 Real-time weather data from Visual Crossing
+- 📦 Redis caching for improved performance
+- 📚 OpenAPI/Swagger documentation
+- 🐳 Docker and Docker Compose setup
+- 🔒 Environment-based configuration
+- ⚡ CORS support
+- 🚀 Production/Development modes
 
 ## Prerequisites
 
-- Docker
-- Docker Compose
-- Visual Crossing API key (get it from [Visual Crossing Weather](https://www.visualcrossing.com/weather-api))
-- Git
+Before you begin, ensure you have:
+- Docker Desktop installed and running ([Download here](https://www.docker.com/products/docker-desktop/))
+- Visual Crossing API key ([Get free key here](https://www.visualcrossing.com/weather-api))
+- Git installed ([Download here](https://git-scm.com/downloads))
+- Port 8080 available on your machine
 
-## Project Structure
+## Installation & Running (Step by Step)
 
-```
-php-weather-api/
-├── src/
-│   ├── public/
-│   │   └── index.php         # Main entry point
-│   ├── Cache/
-│   │   └── RedisCache.php    # Redis cache implementation
-│   └── WeatherAPI.php        # Weather API implementation
-├── Dockerfile                # PHP container configuration
-├── docker-compose.yml        # Docker services configuration
-├── apache.conf              # Apache configuration
-├── composer.json            # PHP dependencies
-└── .env                     # Environment variables
+### 1. Get the Code
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/php-weather-api.git
+
+# Navigate to project directory
+cd php-weather-api
 ```
 
-## Quick Start
+### 2. Configure Environment
+```bash
+# Copy environment file
+cp .env.example .env
 
-1. Clone the repository:
-   ```bash
-   git clone [repository-url]
-   cd php-weather-api
-   ```
+# Open .env in your favorite editor (e.g., vim, nano, VS Code)
+# Replace these values:
+VISUAL_CROSSING_API_KEY=your_api_key_here  # Add your API key
+APP_ENV=development                        # Keep as development for testing
+APP_DEBUG=true                            # Keep as true for testing
+```
 
-2. Copy the example environment file and configure it:
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` and add your Visual Crossing API key:
-   ```env
-   # API Configuration
-   VISUAL_CROSSING_API_KEY=your_api_key_here
+### 3. Start the Application
+```bash
+# Build and start containers
+docker-compose up -d
 
-   # Redis Configuration
-   REDIS_HOST=redis
-   REDIS_PORT=6379
-   REDIS_PASSWORD=
-   REDIS_TIMEOUT=0
-   REDIS_DATABASE=0
-   ```
+# Verify containers are running
+docker-compose ps
+```
 
-3. Build and start the Docker containers:
-   ```bash
-   docker-compose up -d
-   ```
+You should see two containers running:
+- `php-weather-api-php-1`
+- `php-weather-api-redis-1`
 
-4. Install PHP dependencies:
-   ```bash
-   docker-compose exec php composer install
-   ```
+### 4. Verify Installation
 
-5. Verify the installation:
-   ```bash
-   curl "http://localhost:8080/weather/London"
-   ```
+1. Check API Status:
+```bash
+# Test with curl
+curl "http://localhost:8080/weather/London"
+
+# Or open in your browser:
+# http://localhost:8080/weather/London
+```
+
+2. Access Documentation:
+```bash
+# Open in your browser:
+# http://localhost:8080/docs/
+```
+
+Expected Response:
+```json
+{
+    "location": "London, England",
+    "current_weather": {
+        "temperature": "18°C",
+        "conditions": "Partly cloudy",
+        "humidity": "65%",
+        "wind_speed": "12 km/h",
+        "feels_like": "17°C"
+    },
+    "last_updated": "14:30",
+    "cached": false
+}
+```
+
+### 5. Common Issues & Solutions
+
+1. Port Conflict:
+```bash
+# If port 8080 is in use, edit docker-compose.yml:
+ports:
+  - "8081:80"  # Change 8080 to any available port
+```
+
+2. Container Issues:
+```bash
+# View container logs
+docker-compose logs
+
+# Restart containers
+docker-compose restart
+
+# Rebuild containers
+docker-compose up -d --build
+```
+
+3. Redis Connection:
+```bash
+# Check Redis connection
+docker-compose exec redis redis-cli ping
+# Should return: PONG
+```
+
+### 6. Stopping the Application
+```bash
+# Stop containers but keep data
+docker-compose stop
+
+# Stop containers and remove data
+docker-compose down
+```
+
+### 7. Updating the Application
+```bash
+# Pull latest changes
+git pull
+
+# Rebuild containers
+docker-compose up -d --build
+```
+
+## Testing the API
+
+Once running, you can:
+
+1. Use Swagger UI:
+   - Open `http://localhost:8080/docs/`
+   - Try out the /weather endpoint
+
+2. Use curl:
+```bash
+# Get weather for a city
+curl "http://localhost:8080/weather/London"
+
+# Get weather for a city with spaces
+curl "http://localhost:8080/weather/New%20York"
+```
+
+3. Use your browser:
+   - Open `http://localhost:8080/weather/London`
+   - Open `http://localhost:8080/weather/Tokyo`
 
 ## API Endpoints
 
 ### Get Weather Data
-```
+```http
 GET /weather/{city}
 ```
 
-Example request:
-```bash
-curl "http://localhost:8080/weather/London"
-```
+Parameters:
+- `city` (string, required): Name of the city to get weather for
 
-Example response:
+Example Response:
 ```json
 {
-    "location": "London, England, United Kingdom",
+    "location": "London, England",
     "current_weather": {
-        "temperature": "12°C",
+        "temperature": "18°C",
         "conditions": "Partly cloudy",
-        "humidity": "76%",
-        "wind_speed": "15 km/h",
-        "feels_like": "10°C"
+        "humidity": "65%",
+        "wind_speed": "12 km/h",
+        "feels_like": "17°C"
     },
-    "last_updated": "16:00"
+    "last_updated": "14:30",
+    "cached": false
 }
 ```
 
+## Documentation
+
+- API Documentation UI: `http://localhost:8080/docs/`
+- OpenAPI JSON: `http://localhost:8080/api/documentation`
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| APP_ENV | Application environment (development/production) | development |
+| APP_DEBUG | Enable debug mode | true |
+| APP_TIMEZONE | Application timezone | UTC |
+| CACHE_ENABLED | Enable Redis caching | true |
+| CACHE_TTL | Cache duration in seconds | 43200 (12 hours) |
+| REDIS_HOST | Redis host | redis |
+| REDIS_PORT | Redis port | 6379 |
+
+See `.env.example` for all available options.
+
 ## Caching
 
-- Weather data is cached in Redis for 12 hours
-- Cache keys are generated using MD5 hash of the city name
-- If cached data exists, it will be returned instead of making an API call
-
-## Redis Configuration
-
-The Redis connection can be configured using the following environment variables:
-
-- `REDIS_HOST`: Redis server hostname (default: redis)
-- `REDIS_PORT`: Redis server port (default: 6379)
-- `REDIS_PASSWORD`: Redis password if authentication is required (default: none)
-- `REDIS_TIMEOUT`: Redis connection timeout in seconds (default: 0)
-- `REDIS_DATABASE`: Redis database number (default: 0)
+The API uses Redis for caching weather data:
+- Cache duration: 12 hours by default (configurable)
+- Cache key format: `weather:md5(city_name)`
+- Automatic cache invalidation
+- Cache can be disabled via CACHE_ENABLED environment variable
 
 ## Development
 
-### Useful Docker Commands
-
-```bash
-# Start containers
-docker-compose up -d
-
-# Stop containers
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Access PHP container
-docker-compose exec php bash
-
-# Access Redis CLI
-docker-compose exec redis redis-cli
+### Project Structure
+```
+php-weather-api/
+├── src/
+│   ├── public/         # Web root
+│   ├── Cache/          # Cache implementation
+│   ├── docs/           # API documentation
+│   └── WeatherAPI.php  # Core API logic
+├── docker-compose.yml  # Docker composition
+├── Dockerfile         # PHP container definition
+└── apache.conf       # Apache configuration
 ```
 
-### Redis Cache Management
+### Local Development
 
-```bash
-# List all cached keys
-docker exec -it php-weather-api-redis-1 redis-cli keys '*'
-
-# Get TTL for a specific key
-docker exec -it php-weather-api-redis-1 redis-cli ttl "weather:key_hash"
-
-# Monitor Redis operations in real-time
-docker exec -it php-weather-api-redis-1 redis-cli monitor
-
-# Clear all Redis cache
-docker exec -it php-weather-api-redis-1 redis-cli FLUSHALL
+1. Set APP_ENV to development in .env:
+```ini
+APP_ENV=development
+APP_DEBUG=true
 ```
 
-## Troubleshooting
+2. Rebuild containers with development settings:
+```bash
+docker-compose up -d --build
+```
 
-1. **API Key Issues**:
-   - Verify your API key in `.env`
-   - Check API key permissions at Visual Crossing dashboard
+## Production Deployment
 
-2. **Redis Connection Issues**:
-   - Ensure Redis container is running: `docker-compose ps`
-   - Check Redis logs: `docker-compose logs redis`
-   - Verify Redis configuration in `.env`
+1. Update environment settings:
+```ini
+APP_ENV=production
+APP_DEBUG=false
+CACHE_ENABLED=true
+```
 
-3. **Container Issues**:
-   - Rebuild containers: `docker-compose up -d --build`
-   - Check logs: `docker-compose logs`
-   - Verify ports are not in use
+2. Ensure secure values for:
+- VISUAL_CROSSING_API_KEY
+- REDIS_PASSWORD (if used)
+
+3. Deploy using Docker:
+```bash
+docker-compose -f docker-compose.yml up -d
+```
+
+## Error Handling
+
+The API uses standard HTTP status codes:
+- 200: Successful request
+- 400: Invalid input
+- 404: City not found
+- 500: Server error
+
+Error responses include:
+```json
+{
+    "error": true,
+    "message": "Error description"
+}
+```
+
+## Security
+
+- API keys stored in environment variables
+- Production error messages don't expose system details
+- Input validation and sanitization
+- CORS headers for API access control
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin feature/my-new-feature`
-5. Submit a pull request
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-[Your License Here]
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support
+## Acknowledgments
 
-For support, please create an issue in the GitHub repository.
+- [Visual Crossing](https://www.visualcrossing.com/) for weather data
+- [OpenAPI/Swagger](https://swagger.io/) for API documentation
+- [Redis](https://redis.io/) for caching
+- [Docker](https://www.docker.com/) for containerization
